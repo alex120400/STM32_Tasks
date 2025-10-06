@@ -2,3 +2,11 @@ using "./stm32f334.repl"
 
 UserButton: Miscellaneous.Button @ gpioPortC
     -> gpioPortC@13
+
+SW1: Miscellaneous.Button @ gpioPortA
+    invert: true 
+    -> gpioPortA@10
+
+SW2: Miscellaneous.Button @ gpioPortB
+    invert: true 
+    -> gpioPortB@3
