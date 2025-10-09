@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ########################################################################
-# generateTask.py for STM32 task pwm with single led
+# generateTask.py for STM32 task pwm rgb
 # Generates random tasks, generates TaskParameters, fill
 # entity and description templates
 #

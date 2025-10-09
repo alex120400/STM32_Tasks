@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ######################################################################################
-# Generalized tester for VHDL tasks
+# Generalized tester for STM32 tasks
 #
 # Copyright (C) 2017 Martin  Mosbeck   <martin.mosbeck@gmx.at>
 #                    Gilbert Markum    < >
