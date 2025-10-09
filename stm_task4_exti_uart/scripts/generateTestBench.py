@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 ########################################################################
-# generateTestBench.py for STM32 task pwm
+# generateTestBench.py for STM32 task exti uart
 # Generates testvectors and fills a testbench for specified taskParameters
 #
 # Copyright (C) 2015 Martin  Mosbeck   <martin.mosbeck@gmx.at>
+# Copyright (C) 2025 Alexander Dvorak   <alexander120400@gmail.com>
 # License GPL V2 or later (see http://www.gnu.org/licenses/gpl2.txt)
 ########################################################################
 
@@ -16,238 +17,64 @@ from jinja2 import FileSystemLoader, Environment
 
 ##################### Hardware Information ######################
 # commented pins and timers are combinations not available (yet) in renode
-hardware_dict = {"PA5": dict(),
-                 "PA6": dict(),
-                 "PA7": dict(),
-                 #"PB6": dict(),
-                 "PC7": dict(),
-                 "TIM2_CH1": dict(),
-                 "TIM3_CH1": dict(),
-                 "TIM3_CH2": dict(),
-                 "TIM16_CH1": dict(),
-                 #"TIM16_CH1N": dict(),
-                 "TIM17_CH1": dict()
+hardware_dict = {"SW1-PA10": dict(),
+                 "SW2-PB3": dict()
                 }
 
-hardware_dict["PA5"].update({"GPIO_PORT": "gpioPortA",  # all values verified
-                             "GPIO_PIN": "5",
+hardware_dict["SW1-PA10"].update({"MAIN_SW_PORT": "gpioPortA",
+                                  "MAIN_SW": "SW1",
 
-                             "GPIO_clk_en_reg_offset": "20", 
-                             "GPIO_clk_en_bit_shift": "17", "GPIO_clk_en_mask": "1", "GPIO_clk_en_comp_val": "1",
+                                  "SECONDARY_SW_PORT": "gpioPortB",
+                                  "SECONDARY_SW": "SW2",
 
-                             "GPIO_mode_reg_offset": "0",
-                             "GPIO_mode_bit_shift": "10", "GPIO_mode_mask": "3", "GPIO_mode_comp_val": "2",
+                                  "IRQ_function_name": "EXTI15_10_IRQHandler",
 
-                            # AF is closer connected to timer/channel
-                             })
+                                  "SYSCFG_EXTI_conn_reg_offset": "16",
+                                  "SYSCFG_EXTI_conn_bit_shift": "8", "SYSCFG_EXTI_conn_mask": "7", "SYSCFG_EXTI_conn_comp_val": "0",
 
-hardware_dict["PA6"].update({"GPIO_PORT": "gpioPortA",  # all values verified
-                             "GPIO_PIN": "6",
+                                  "EXTI_IT_reg_offset": "0",
+                                  "EXTI_IT_bit_shift": "10", "EXTI_IT_mask": "1", "EXTI_IT_comp_val": "1",
 
-                             "GPIO_clk_en_reg_offset": "20", 
-                             "GPIO_clk_en_bit_shift": "17", "GPIO_clk_en_mask": "1", "GPIO_clk_en_comp_val": "1",
+                                  "EXTI_Edge_reg_offset": "12",
+                                  "EXTI_Edge_bit_shift": "10", "EXTI_Edge_mask": "1", "EXTI_Edge_comp_val": "1",
+                                })
 
-                             "GPIO_mode_reg_offset": "0",
-                             "GPIO_mode_bit_shift": "12", "GPIO_mode_mask": "3", "GPIO_mode_comp_val": "2",
+hardware_dict["SW2-PB3"].update({"MAIN_SW_PORT": "gpioPortB",
+                                 "MAIN_SW": "SW2",
 
-                             })
+                                 "SECONDARY_SW_PORT": "gpioPortA",
+                                 "SECONDARY_SW": "SW1",
 
-hardware_dict["PA7"].update({"GPIO_PORT": "gpioPortA",  # all values verified
-                             "GPIO_PIN": "7",
+                                 "IRQ_function_name": "EXTI3_IRQHandler",
 
-                             "GPIO_clk_en_reg_offset": "20", 
-                             "GPIO_clk_en_bit_shift": "17", "GPIO_clk_en_mask": "1", "GPIO_clk_en_comp_val": "1",
+                                 "SYSCFG_EXTI_conn_reg_offset": "8",
+                                 "SYSCFG_EXTI_conn_bit_shift": "12", "SYSCFG_EXTI_conn_mask": "7", "SYSCFG_EXTI_conn_comp_val": "1",
 
-                             "GPIO_mode_reg_offset": "0",
-                             "GPIO_mode_bit_shift": "14", "GPIO_mode_mask": "3", "GPIO_mode_comp_val": "2",
-                             })
+                                 "EXTI_IT_reg_offset": "0",
+                                 "EXTI_IT_bit_shift": "3", "EXTI_IT_mask": "1", "EXTI_IT_comp_val": "1",
 
-# hardware_dict["PB6"].update({"GPIO_PORT": "gpioPortB",  # all values verified
-#                              "GPIO_PIN": "6",
-
-#                              "GPIO_clk_en_reg_offset": "20", 
-#                              "GPIO_clk_en_bit_shift": "18", "GPIO_clk_en_mask": "1", "GPIO_clk_en_comp_val": "1",
-
-#                              "GPIO_mode_reg_offset": "0",
-#                              "GPIO_mode_bit_shift": "12", "GPIO_mode_mask": "3", "GPIO_mode_comp_val": "2",
-#                              })
-
-hardware_dict["PC7"].update({"GPIO_PORT": "gpioPortC",  # all values verified
-                             "GPIO_PIN": "7",
-
-                             "GPIO_clk_en_reg_offset": "20", 
-                             "GPIO_clk_en_bit_shift": "19", "GPIO_clk_en_mask": "1", "GPIO_clk_en_comp_val": "1",
-
-                             "GPIO_mode_reg_offset": "0",
-                             "GPIO_mode_bit_shift": "14", "GPIO_mode_mask": "3", "GPIO_mode_comp_val": "2",
-
-                             })
-
-hardware_dict["TIM2_CH1"].update({"TIM": "2",   # all values verified
-                                  "CHANNEL": "0",   # in renode, channel numbering starts at 0 -> CH1 = 0, CH2 = 1, ...
-
-                                  "PRESCALER_reg_offset": "40",
-                                  "ARR_reg_offset": "44",
-
-                                  "TIM_clk_en_reg_offset": "28", 
-                                  "TIM_clk_en_bit_shift": "0", "TIM_clk_en_mask": "1", "TIM_clk_en_comp_val": "1",
-
-                                  "TIM_control1_reg_offset": "0",
-                                  "TIM_control1_bit_shift": "0", "TIM_control1_mask": "17", "TIM_control1_comp_val": "1",
-
-                                  "TIM_mode_reg_offset": "24",
-                                  "TIM_mode_bit_shift": "4", "TIM_mode_mask": "4103", "TIM_mode_comp_val": "6",
-
-                                  "TIM_OC_pol_en_reg_offset": "32",
-                                  "TIM_OC_pol_en_bit_shift": "0", "TIM_OC_pol_en_mask": "3", "TIM_OC_pol_en_comp_val": "1",
-                                    
-                                  "GPIO_AF_reg_offset": "32",
-                                  "GPIO_AF_bit_shift": "20", "GPIO_AF_mask": "15", "GPIO_AF_comp_val": "1" # AF1 is needed with PA5
-                                  })
-
-hardware_dict["TIM3_CH1"].update({"TIM": "3",
-                                  "CHANNEL": "0",
-
-                                  "PRESCALER_reg_offset": "40",
-                                  "ARR_reg_offset": "44",
-
-                                  "TIM_clk_en_reg_offset": "28", 
-                                  "TIM_clk_en_bit_shift": "1", "TIM_clk_en_mask": "1", "TIM_clk_en_comp_val": "1",
-
-                                  "TIM_control1_reg_offset": "0",
-                                  "TIM_control1_bit_shift": "0", "TIM_control1_mask": "17", "TIM_control1_comp_val": "1",
-
-                                  "TIM_mode_reg_offset": "24",
-                                  "TIM_mode_bit_shift": "4", "TIM_mode_mask": "4103", "TIM_mode_comp_val": "6",
-
-                                  "TIM_OC_pol_en_reg_offset": "32",
-                                  "TIM_OC_pol_en_bit_shift": "0", "TIM_OC_pol_en_mask": "3", "TIM_OC_pol_en_comp_val": "1",
-
-                                  "GPIO_AF_reg_offset": "32",
-                                  "GPIO_AF_bit_shift": "24", "GPIO_AF_mask": "15", "GPIO_AF_comp_val": "2" # AF2 is needed for PA6
-                                  })
-
-hardware_dict["TIM3_CH2"].update({"TIM": "3",
-                                  "CHANNEL": "1",
-
-                                  "PRESCALER_reg_offset": "40",
-                                  "ARR_reg_offset": "44",
-
-                                  "TIM_clk_en_reg_offset": "28", 
-                                  "TIM_clk_en_bit_shift": "1", "TIM_clk_en_mask": "1", "TIM_clk_en_comp_val": "1",
-
-                                  "TIM_control1_reg_offset": "0",
-                                  "TIM_control1_bit_shift": "0", "TIM_control1_mask": "17", "TIM_control1_comp_val": "1",
-
-                                  "TIM_mode_reg_offset": "24",
-                                  "TIM_mode_bit_shift": "12", "TIM_mode_mask": "4103", "TIM_mode_comp_val": "6",
-
-                                  "TIM_OC_pol_en_reg_offset": "32",
-                                  "TIM_OC_pol_en_bit_shift": "4", "TIM_OC_pol_en_mask": "3", "TIM_OC_pol_en_comp_val": "1",
-
-                                  "GPIO_AF_reg_offset": "32",
-                                  "GPIO_AF_bit_shift": "28", "GPIO_AF_mask": "15", "GPIO_AF_comp_val": "2" # AF2 is needed for PA7 or PC7
-                                  })
-
-hardware_dict["TIM16_CH1"].update({"TIM": "16",
-                                  "CHANNEL": "0",
-
-                                  "PRESCALER_reg_offset": "40",
-                                  "ARR_reg_offset": "44",
-
-                                  "TIM_clk_en_reg_offset": "24", 
-                                  "TIM_clk_en_bit_shift": "17", "TIM_clk_en_mask": "1", "TIM_clk_en_comp_val": "1",
-
-                                  "TIM_control1_reg_offset": "0",
-                                  "TIM_control1_bit_shift": "0", "TIM_control1_mask": "1", "TIM_control1_comp_val": "1",
-
-                                  "TIM_mode_reg_offset": "24",
-                                  "TIM_mode_bit_shift": "4", "TIM_mode_mask": "4103", "TIM_mode_comp_val": "6",
-
-                                  "TIM_OC_pol_en_reg_offset": "32",
-                                  "TIM_OC_pol_en_bit_shift": "0", "TIM_OC_pol_en_mask": "3", "TIM_OC_pol_en_comp_val": "1",
-                                
-                                  "GPIO_AF_reg_offset": "32",
-                                  "GPIO_AF_bit_shift": "24", "GPIO_AF_mask": "15", "GPIO_AF_comp_val": "1" # AF1 is needed for PA6
-                                  })
-
-# hardware_dict["TIM16_CH1N"].update({"TIM": "16",
-#                                   "CHANNEL": "0",
-
-#                                   "PRESCALER_reg_offset": "40",
-#                                   "ARR_reg_offset": "44",
-
-#                                   "TIM_clk_en_reg_offset": "24", 
-#                                   "TIM_clk_en_bit_shift": "17", "TIM_clk_en_mask": "1", "TIM_clk_en_comp_val": "1",
-
-#                                   "TIM_control1_reg_offset": "0",
-#                                   "TIM_control1_bit_shift": "0", "TIM_control1_mask": "1", "TIM_control1_comp_val": "1",
-
-#                                   "TIM_mode_reg_offset": "24",
-#                                   "TIM_mode_bit_shift": "4", "TIM_mode_mask": "4103", "TIM_mode_comp_val": "6",
-
-#                                   "TIM_OC_pol_en_reg_offset": "32",
-#                                   "TIM_OC_pol_en_bit_shift": "2", "TIM_OC_pol_en_mask": "3", "TIM_OC_pol_en_comp_val": "1", # N
-                                  
-#                                   "GPIO_AF_reg_offset": "32",
-#                                   "GPIO_AF_bit_shift": "28", "GPIO_AF_mask": "15", "GPIO_AF_comp_val": "1" # AF1 is needed for PB6
-#                                   })
-
-hardware_dict["TIM17_CH1"].update({"TIM": "17",
-                                  "CHANNEL": "0",
-
-                                  "PRESCALER_reg_offset": "40",
-                                  "ARR_reg_offset": "44",
-
-                                  "TIM_clk_en_reg_offset": "24", 
-                                  "TIM_clk_en_bit_shift": "18", "TIM_clk_en_mask": "1", "TIM_clk_en_comp_val": "1",
-
-                                  "TIM_control1_reg_offset": "0",
-                                  "TIM_control1_bit_shift": "0", "TIM_control1_mask": "1", "TIM_control1_comp_val": "1",
-
-                                  "TIM_mode_reg_offset": "24",
-                                  "TIM_mode_bit_shift": "4", "TIM_mode_mask": "4103", "TIM_mode_comp_val": "6",
-
-                                  "TIM_OC_pol_en_reg_offset": "32",
-                                  "TIM_OC_pol_en_bit_shift": "0", "TIM_OC_pol_en_mask": "3", "TIM_OC_pol_en_comp_val": "1",
-                                
-                                  "GPIO_AF_reg_offset": "32",
-                                  "GPIO_AF_bit_shift": "28", "GPIO_AF_mask": "15", "GPIO_AF_comp_val": "1" # AF2 is needed for PA7
-                                  })
-
-
+                                 "EXTI_Edge_reg_offset": "12",
+                                 "EXTI_Edge_bit_shift": "3", "EXTI_Edge_mask": "1", "EXTI_Edge_comp_val": "1",
+                                })
 
 
 
 
 #################################################################
 
-taskParameters = sys.argv[1].strip().split("#") # order is: frq(in Hz), duty(in %), pin, tim/channel
-GPIO_key = taskParameters[2]
-TIM_CHANNEL_key = taskParameters[3]
+taskParameters = sys.argv[1].strip().split("#") # order is: char, switch
+chosen_small_char = taskParameters[0]
+SWITCH_key = taskParameters[1]
 random_tag = sys.argv[2]
 params = {}
 
-simCycles = random.randrange(5, 30)
-# periodClks = taskParameters >> 18
-# dutyClks = taskParameters & (2**18 - 1)
 
 #########################################
 # SET PARAMETERS FOR TESTBENCH TEMPLATE #
 #########################################
-params.update(
-    {
-        "random_tag": random_tag,
-        "FRQ": taskParameters[0],
-        "DUTY": taskParameters[1],
-        "PIN": taskParameters[2],
-        "TIM_CHANNEL": taskParameters[3],
-        "SIMCYCLES": simCycles,
-    }
-)
-
-params.update(hardware_dict[GPIO_key])
-params.update(hardware_dict[TIM_CHANNEL_key])
+params.update({"SMALL_CHAR": chosen_small_char})
+params.update(hardware_dict[SWITCH_key])
+#params.update(hardware_dict[TIM_CHANNEL_key])
 
 ###########################
 # FILL TESTBENCH TEMPLATE #

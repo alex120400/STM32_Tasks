@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ########################################################################
-# generator.sh for STM32 task3 led controlled via exti and switches
+# generator.sh for STM32 task4 uart2 controlled via exti and switches
 # Generates the individual tasks, enters in databases and moves
 # description files to user folder
 #
@@ -112,7 +112,7 @@ rm -f desc_${user_id}_Task${task_nr}.out
 mv ${task_path}/tmp/desc_${user_id}_Task${task_nr}.pdf ${desc_path}
 
 #copy static files to user's description folder
-cp ${task_path}/static/exti_led.c ${desc_path}
+cp ${task_path}/static/exti_uart.c ${desc_path}
 
 ln -s $backend_interfaces_path/support_files/renode_stm32f3/ $renode_path
 
@@ -126,7 +126,7 @@ cp ${task_path}/exam/README.txt ${desc_path}/README.txt
 ##   EMAIL ATTACHMENTS  ##
 ##########################
 task_attachments=""
-task_attachments_base="${desc_path}/desc_${user_id}_Task${task_nr}.pdf ${desc_path}/exti_led.c"
+task_attachments_base="${desc_path}/desc_${user_id}_Task${task_nr}.pdf ${desc_path}/exti_uart.c"
 
 if [ -n "${mode}" ];
 then

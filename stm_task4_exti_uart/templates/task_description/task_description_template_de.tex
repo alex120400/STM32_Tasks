@@ -16,29 +16,32 @@
 \begin{document}
 \pagestyle{empty}
 \setlength{\parindent}{0em}
-\section*{Task {{TASKNR}}: Ansteuerung einer LED mittels PWM (Pulsweitenmodulation)}
+\section*{Task {{TASKNR}}: Extendend Interrupt Controller (EXTI) und Verwendung der UART}
 
-Ihre Aufgabe ist es, eine der verfügbaren LEDs auf dem Adapter Board für das Nucleo Board über die Capture/Compare Module eines Timers zu steuern. Nutzen Sie hierzu die Informationen im Datenblatt \cite{data_sheet} und Reference Manual \cite{ref_manual} des STM32F334 sowie das User Manual für das Nucleo-64 Board \cite{nucleo_manual} und die Beschreibung der LL Driver \cite{driver_manual}. Verwenden Sie außerdem die bereits vorbereitete Datei \enquote{pwm\_single\_led.c} und beachten sie die folgenden Vorgaben für Ihre Lösung:
+Ihre Aufgabe ist es, einen der verfügbaren Taster auf dem Adapter Board für das Nucleo Board über den Extendend Interrupt Controller (EXTI) zu handhaben und bei Betätigung des Tasters einen Interrupt auszulösen. Da der GPIO an dem der Taster hängt, über einen externen Pull-up Widerstand auf High gehoben ist, und bei Betätigung des Tasters auf GND gezogen wird, soll der Interrupt auch bei der fallenden Flanke des Signals ausgelöst werden. Bei Betätigung des Tasters soll dann ein gegebener Kleinbuchstabe per Uart (UART2) gesendet werden. Wird zusätzlich der weitere Taster zuvor gedrückt und dann gehalten während der erste Taster betätigt wird, soll die gleiche Buchstabe als Großbuchstabe gesendet werden. Der zweite Taster soll über die Input-Funktionalitäten der GPIOs ausgelesen werden und nicht mittels EXTI gehandhabt werden. Nutzen Sie hierzu die Informationen im Datenblatt \cite{data_sheet} und Reference Manual \cite{ref_manual} des STM32F334 sowie das User Manual für das Nucleo-64 Board \cite{nucleo_manual} und die Beschreibung der LL Driver \cite{driver_manual}. Verwenden Sie außerdem die bereits vorbereitete Datei \enquote{exti\_uart.c} und beachten sie die folgenden Vorgaben für Ihre Lösung:
 
 \begin{itemize}
-\item Frequenz mit der die LED blinken soll: $f_{PWM}$= {{FRQ}}\,Hz ($=\frac{1}{T_{PWM}}$)
-\item Tastverh\"altnis (duty cycle):  $\frac{T_{HIGH}}{T_{PWM}}$ = {{DUTY}}\,\%
-\item Anzusteuernder Pin (und damit festgelegte LED): {{PIN}}
-\item Zu nutzender Timer/Channel: {{CHANNEL}}
-\item Die Anfangsflanke (wechsel zu High) des Signals soll konstant gehalten und die Endflanke (wechsel zu Low) entsprechend moduliert werden.
+\item Zu sendender Kleinbuchstabe: {{CHAR}}
+\item UART2 Konfiguration:
+\begin{itemize}
+    \item 1 Start-bit
+    \item 1 Stop-bit
+    \item 8 Data-bits
+    \item kein Paritäts-bit
+    \item Frequenz: 38400\,Hz 
+\end{itemize}
+\item Mittels EXTI zu steuernder Schalter und damit festgelegter Pin: {{SW}}
+\item Die Anfangsflanke (wechsel zu Low) des Signals soll den Interrupt auslösen.
 \end{itemize}
 \vspace{0.3cm}
 
-Es sind die Capture/Compare Kanäle des spezifischen Timers zu nutzen. Lösungen die etwaige Delays oder Interrupt Routinen nutzen werden nicht als Lösung akzeptiert.
+Es ist ausdrücklich die Interrupt-Steuerung mittels EXTI zu verwenden für den spezifizierten Taster und die GPIO-Input Funktionalität für den weiteren Taster. Lösungen über Polling werden nicht akzeptiert.
 \\
 
-\fbox{\parbox{\linewidth}{Achtung: Die Timer 16 und 17 besitzen komplementäre (N) Kanäle, die zusammen mit den gewöhnlichen Kanälen und der Einführung einer Tod-Zeit für eine definierte Abfolge an z.B. Schaltsignalen sorgen. Deshalb muss bei diesen Timern ein weiteres bit (das MOE-bit) im TIMx\_BDTR Register gesetzt werden um einen Output zu generieren. Verwenden Sie hierzu den Befehl \enquote{LL\_TIM\_EnableAllOutputs(TIMx)} sofern Sie einen der beiden Timer benutzen sollen und nachdem Sie den Timer konfiguriert haben.}}
+Programmieren Sie das obig definierte Verhalten in der angeh\"angten Datei \enquote{exti\_uart.c}.
 \\
 
-Programmieren Sie das obig definierte Verhalten in der angeh\"angten Datei \enquote{pwm\_single\_led.c}.
-\\
-
-Um Ihre L\"osung abzugeben, senden Sie ein E-Mail mit dem Betreff \enquote{Result Task {{ TASKNR }}} und Ihrer Datei \enquote{pwm\_single\_led.c}  an {{ SUBMISSIONEMAIL }}.
+Um Ihre L\"osung abzugeben, senden Sie ein E-Mail mit dem Betreff \enquote{Result Task {{ TASKNR }}} und Ihrer Datei \enquote{exti\_uart.c}  an {{ SUBMISSIONEMAIL }}.
 
 \vspace{0.7cm}
 

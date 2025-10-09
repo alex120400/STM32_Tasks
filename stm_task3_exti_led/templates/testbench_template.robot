@@ -6,13 +6,6 @@ Suite Teardown      Teardown
 Test Teardown       Test Teardown
 
 
-*** Variables ***
-${desired_freq}                 {{FRQ}}
-${desired_duty_cycle}           {{DUTY}}
-${desired_pin}                  {{PIN}}
-${desired_tim_channel}          {{TIM_CHANNEL}}
-${simulation_cycles}            {{SIMCYCLES}}
-${percentage_tolerance}         1
 
 
 *** Test Cases ***
@@ -60,14 +53,14 @@ Test for correct implementation
     ${SYSCFG_Clock_Enabled}=    Execute Command    rcc ReadDoubleWord 24
     Verify Register Value       ${SYSCFG_Clock_Enabled}    ${0}    ${1}    ${1}    "SYSCFG's clock is not enabled!"
 
-    ${SYSCFG_EXTI_conn}=        Execute Command     syscfg ReadDoubleWord 16
-    Verify Register Value       ${SYSCFG_EXTI_conn}    ${8}    ${7}    ${0}    "SYSCFG's EXTI connection is not configured correctly!"
+    ${SYSCFG_EXTI_conn}=        Execute Command     syscfg ReadDoubleWord {{SYSCFG_EXTI_conn_reg_offset}}
+    Verify Register Value       ${SYSCFG_EXTI_conn}    ${ {{SYSCFG_EXTI_conn_bit_shift}} }    ${ {{SYSCFG_EXTI_conn_mask}} }    ${ {{SYSCFG_EXTI_conn_comp_val}} }    "SYSCFG's EXTI connection is not configured correctly!"
 
-    ${EXTI_IT_Setting}=         Execute Command    exti ReadDoubleWord 0
-    Verify Register Value       ${EXTI_IT_Setting}    ${10}    ${1}    ${1}    "EXTI is not configured for Interrupt generation!"
+    ${EXTI_IT_Setting}=         Execute Command    exti ReadDoubleWord {{EXTI_IT_reg_offset}}
+    Verify Register Value       ${EXTI_IT_Setting}    ${ {{EXTI_IT_bit_shift}} }    ${ {{EXTI_IT_mask}} }    ${ {{EXTI_IT_comp_val}} }    "EXTI is not configured for Interrupt generation!"
 
-    ${EXTI_Edge_Setting}=       Execute Command    exti ReadDoubleWord 12
-    Verify Register Value       ${EXTI_Edge_Setting}    ${10}    ${1}    ${1}    "EXTI is not configured to trigger an Interrupt at the Falling Edge of the Input signal!"
+    ${EXTI_Edge_Setting}=       Execute Command    exti ReadDoubleWord {{EXTI_Edge_reg_offset}}
+    Verify Register Value       ${EXTI_Edge_Setting}    ${ {{EXTI_Edge_bit_shift}} }    ${ {{EXTI_Edge_mask}} }    ${ {{EXTI_Edge_comp_val}} }    "EXTI is not configured to trigger an Interrupt at the Falling Edge of the Input signal!"
 
 
 
@@ -81,18 +74,18 @@ Test for correct behaviour
     ${led_state}=       Return LED State
     Should Not Be True    ${led_state}    msg="The LED must be off initially!" 
 
-    ${other_sw_state}=    Return SW State    gpioPortB.SW2
-    Should Not Be True    ${other_sw_state}
-    Execute Command     gpioPortA.SW1 Press
-    Execute Command     gpioPortA.SW1 Release
+    ${other_sw_state}=    Return SW State    {{SECONDARY_SW_PORT}}.{{SECONDARY_SW}}
+    Should Not Be True    ${other_sw_state}     msg="{{SECONDARY_SW}} should not be pressed at the beginning!"
+    Execute Command     {{MAIN_SW_PORT}}.{{MAIN_SW}} Press
+    Execute Command     {{MAIN_SW_PORT}}.{{MAIN_SW}} Release
     ${led_state}=       Return LED State
-    Should Be True      ${led_state}    msg="The LED did not turn on after pressing SW1!"
+    Should Be True      ${led_state}    msg="The LED did not turn on after pressing {{MAIN_SW}}!"
 
-    Execute Command     gpioPortB.SW2 Press
-    Execute Command     gpioPortA.SW1 Press
-    Execute Command     gpioPortA.SW1 Release
+    Execute Command     {{SECONDARY_SW_PORT}}.{{SECONDARY_SW}} Press
+    Execute Command     {{MAIN_SW_PORT}}.{{MAIN_SW}} Press
+    Execute Command     {{MAIN_SW_PORT}}.{{MAIN_SW}} Release
     ${led_state}=       Return LED State
-    Should Not Be True    ${led_state}    msg="The LED did not turn off after pressing SW1 and holding the other!"
+    Should Not Be True    ${led_state}    msg="The LED did not turn off after pressing {{MAIN_SW}} and holding the other!"
 
 
 Test for IRQ
@@ -100,12 +93,12 @@ Test for IRQ
     [Documentation]          Checks if the button push triggers the interrupt request
 
     Create Nucleo Board
-    Execute Command     sysbus.cpu LogFunctionNames true "EXTI15_10_IRQHandler"
+    Execute Command     sysbus.cpu LogFunctionNames true "{{IRQ_function_name}}"
     Create Log Tester   ${1.0}
     
     Start Emulation
-    Execute Command     gpioPortA.SW1 Press
-    Wait For Expected Log      .*Entering function EXTI15_10_IRQHandler.*     ${0.5}    # .* is wildcard matching anything
+    Execute Command     {{MAIN_SW_PORT}}.{{MAIN_SW}} Press
+    Wait For Expected Log      .*Entering function {{IRQ_function_name}}.*     ${0.5}    # .* is wildcard matching anything
             
 
 
