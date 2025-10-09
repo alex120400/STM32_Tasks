@@ -176,9 +176,36 @@ namespace Antmicro.Renode.Peripherals.UART
                 .WithValueField(0, 4, out dividerFraction, name: "DIV_Fraction")
                 .WithValueField(4, 12, out dividerMantissa, name: "DIV_Mantissa")
             ;
-            Register.Control1.Define(this, name: "USART_CR1")
-                .WithTaggedFlag("SBK", 0)
-                .WithTaggedFlag("RWU", 1)
+            // Register.Control1.Define(this, name: "USART_CR1")
+            //     .WithTaggedFlag("SBK", 0)
+            //     .WithTaggedFlag("RWU", 1)
+            //     .WithFlag(2, out receiverEnabled, name: "RE")
+            //     .WithFlag(3, out transmitterEnabled, name: "TE")
+            //     .WithFlag(4, out idleLineDetectedInterruptEnabled, name: "IDLEIE")
+            //     .WithFlag(5, out receiverNotEmptyInterruptEnabled, name: "RXNEIE")
+            //     .WithFlag(6, out transmissionCompleteInterruptEnabled, name: "TCIE")
+            //     .WithFlag(7, out transmitDataRegisterEmptyInterruptEnabled, name: "TXEIE")
+            //     .WithTaggedFlag("PEIE", 8)
+            //     .WithEnumField(9, 1, out paritySelection, name: "PS")
+            //     .WithFlag(10, out parityControlEnabled, name: "PCE")
+            //     .WithTaggedFlag("WAKE", 11)
+            //     .WithTaggedFlag("M", 12)
+            //     .WithFlag(13, out usartEnabled, name: "UE")
+            //     .WithReservedBits(14, 1)
+            //     .WithEnumField(15, 1, out oversamplingMode, name: "OVER8")
+            //     .WithReservedBits(16, 16)
+            //     .WithWriteCallback((_, __) =>
+            //     {
+            //         if (!receiverEnabled.Value || !usartEnabled.Value)
+            //         {
+            //             idleLineDetectedCancellationTokenSrc?.Cancel();
+            //         }
+            //         Update();
+            //     })
+            // ;
+            Register.Control1.Define(this, 0, name: "USART_CR1")
+                .WithFlag(0, out usartEnabled, name: "UE")
+                .WithTaggedFlag("UESM", 1) // USART Enable in Stop mode
                 .WithFlag(2, out receiverEnabled, name: "RE")
                 .WithFlag(3, out transmitterEnabled, name: "TE")
                 .WithFlag(4, out idleLineDetectedInterruptEnabled, name: "IDLEIE")
@@ -189,11 +216,16 @@ namespace Antmicro.Renode.Peripherals.UART
                 .WithEnumField(9, 1, out paritySelection, name: "PS")
                 .WithFlag(10, out parityControlEnabled, name: "PCE")
                 .WithTaggedFlag("WAKE", 11)
-                .WithTaggedFlag("M", 12)
-                .WithFlag(13, out usartEnabled, name: "UE")
-                .WithReservedBits(14, 1)
-                .WithEnumField(15, 1, out oversamplingMode, name: "OVER8")
-                .WithReservedBits(16, 16)
+                .WithTaggedFlag("M0", 12) // Data length bit 0
+                .WithTaggedFlag("MME", 13) // Mute Mode Enable
+                .WithTaggedFlag("CMIE", 14) // Character Match Interrupt Enable
+                .WithEnumField(15, 1, out oversamplingMode, name: "OVER8") // Oversampling Mode Select
+                .WithTag("DEDT", 16, 5) // Driver Enable Deassertion Time [4:0]
+                .WithTag("DEAT", 21, 5) // Driver Enable Assertion Time [4:0]
+                .WithTaggedFlag("RTOIE", 26) // Receiver Timeout Interrupt Enable
+                .WithTaggedFlag("EOBIE", 27) // End of Block Interrupt Enable
+                .WithTaggedFlag("M1", 28) // Data length bit 1
+                .WithReservedBits(29, 3) // Reserved
                 .WithWriteCallback((_, __) =>
                 {
                     if (!receiverEnabled.Value || !usartEnabled.Value)

@@ -2,8 +2,7 @@
 :description: This script runs the example on stm32f334R8
 
 $name?="STM32F334R8"
-$bin_path?=$CWD/build/stm32-exti_led.elf
-#$bin_path?=$CWD/build/stm32-pwm_rgb.elf
+$bin_path?=$CWD/build/stm32-exti_uart.elf
 
 #Include custom STM32 HW
 i $CWD/renode/renode_stm32f3/STM32F3_RCC.cs
