@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 ########################################################################
-# generateTestBench.py for STM32 task pwm
+# generateTestBench.py for STM32 task pwm single led
 # Generates testvectors and fills a testbench for specified taskParameters
 #
 # Copyright (C) 2015 Martin  Mosbeck   <martin.mosbeck@gmx.at>
+# Copyright (C) 2025 Alexander Dvorak   <alexander120400@gmail.com>
 # License GPL V2 or later (see http://www.gnu.org/licenses/gpl2.txt)
 ########################################################################
 

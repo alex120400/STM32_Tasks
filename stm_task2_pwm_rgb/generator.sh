@@ -7,6 +7,7 @@
 #
 # Copyright (C) 2015 Martin  Mosbeck   <martin.mosbeck@gmx.at>
 # Copyright (C) 2025 Philipp-S. Vogt <philippvogt@gmx.at>
+# Copyright (C) 2025 Alexander Dvorak   <alexander120400@gmail.com>
 # License GPL V2 or later (see http://www.gnu.org/licenses/gpl2.txt)
 ########################################################################
 
