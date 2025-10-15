@@ -2,29 +2,31 @@
 :description: This script runs the example on stm32f334R8
 
 $name?="STM32F334R8"
-$bin_path?=$CWD/build/stm32-exti_uart.elf
+$bin_path?=$CWD/build/stm32-adc_ldr.elf
 
 #Include custom STM32 HW
 i $CWD/renode/renode_stm32f3/STM32F3_RCC.cs
 i $CWD/renode/renode_stm32f3/STM32F3_FlashController.cs
 i $CWD/renode/renode_stm32f3/STM32F3_UART.cs
 i $CWD/renode/renode_stm32f3/STM32F3_EXTI.cs
+i $CWD/renode/renode_stm32f3/STM32F3_Timers.cs
+i $CWD/renode/renode_stm32f3/STM32F3_ADC_Common.cs
+i $CWD/renode/renode_stm32f3/STM32F334R8_ADC.cs
 
 # Create Machine & Load config
 mach create $name
 machine LoadPlatformDescription $CWD/renode/renode_stm32f3/stm32f334R8_nucleo.repl
 
 # Create a terminal window showing the output of UART2
-showAnalyzer sysbus.usart2
+#showAnalyzer sysbus.usart2
 
-# Add Debug LED
-machine LoadPlatformDescriptionFromString "LED: Miscellaneous.LED @ gpioPortA 5"
-machine LoadPlatformDescriptionFromString "gpioPortA: { 5 -> LED@0 }"
+# Add LED
+machine LoadPlatformDescriptionFromString "LED: Miscellaneous.LED @ gpioPortA 6"
+machine LoadPlatformDescriptionFromString "gpioPortA: { 6 -> LED@0 }"
 
 # python hook
-#cpu AddHookAtInterruptBegin "print 'Interrupt %d has started' % exceptionIndex"
-#cpu AddHookAtInterruptBegin "monitor.Parse('pause')"
-#sysbus.cpu LogFunctionNames true "EXTI15_10_IRQHandler"
+cpu AddHookAtInterruptBegin "print 'Interrupt %d has started' % exceptionIndex"
+#sysbus.cpu LogFunctionNames true "TIM1_UP_TIM16_IRQHandler"
 
 # Add PWM tester, to see highticks, lowticks
 #machine LoadPlatformDescriptionFromString "pt: PWMTester @ gpioPortB 6"
@@ -33,6 +35,9 @@ machine LoadPlatformDescriptionFromString "gpioPortA: { 5 -> LED@0 }"
 # Enable GDB
 # machine StartGdbServer 3333
 
+# Feed ADC with data, channel numbering in same as actual channel name
+adc FeedVoltageSampleToChannel 2 3000 100
+
 macro reset
 """
     sysbus LoadELF $bin_path
@@ -40,4 +45,4 @@ macro reset
 
 runMacro $reset
 
-start
+#start
