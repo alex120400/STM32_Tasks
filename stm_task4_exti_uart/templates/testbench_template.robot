@@ -119,6 +119,9 @@ Create Nucleo Board
     Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_EXTI.cs
     Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_UART.cs
     Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_FlashController.cs
+    Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_Timers.cs
+    Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_ADC_Common.cs
+    Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F334R8_ADC.cs
 
     Execute Command    $bin = @${CURDIR}/build/stm32-exti_uart.elf
 

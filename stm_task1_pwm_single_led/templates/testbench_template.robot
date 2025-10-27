@@ -61,7 +61,7 @@ Test for correct Frequency
     ${auto_reload}=    Convert to Integer    ${auto_reload}
     ${actual_frequency}=    Evaluate    ${64000000} / (${prescaler} + 1) / (${auto_reload} + 1)
     ${expected_frequency}=     Convert to Number    ${desired_freq}
-    Should Be Equal Within Range    ${expected_frequency}  ${actual_frequency}  ${0.1}  "Wrong Timer Frequency. Expected: ${expected_frequency} vs Acutal: ${actual_frequency}"
+    Should Be Equal Within Range    ${expected_frequency}  ${actual_frequency}  ${0.00001}  "Wrong Timer Frequency. Expected: ${expected_frequency} vs Acutal: ${actual_frequency}"
 
 
 Test for correct Duty Cycle
@@ -71,7 +71,7 @@ Test for correct Duty Cycle
     Create Nucleo Board
     Execute Command          {{GPIO_PORT}}.pt Reset
     Execute Command          pause
-    Execute Command          emulation RunFor "5"
+    Execute Command          emulation RunFor "15"
 
     ${hp}=  Execute Command  {{GPIO_PORT}}.pt HighPercentage
     ${actual_percent}=    Convert Duty Cycle    ${hp}
@@ -93,6 +93,9 @@ Create Nucleo Board
     Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_EXTI.cs
     Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_UART.cs
     Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_FlashController.cs
+    Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_Timers.cs
+    Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_ADC_Common.cs
+    Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F334R8_ADC.cs
 
     Execute Command    $bin = @${CURDIR}/build/stm32-pwm_single_led.elf
 

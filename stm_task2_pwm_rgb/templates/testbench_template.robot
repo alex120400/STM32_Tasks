@@ -108,7 +108,7 @@ Test for correct Duty Cycle Timer 3
     Create Nucleo Board
     Execute Command          gpioPortC.ptC Reset
     Execute Command          pause
-    Execute Command          emulation RunFor "5"
+    Execute Command          emulation RunFor "15"
 
     ${hp}=  Execute Command  gpioPortC.ptC HighPercentage
     ${actual_percent}=    Convert Duty Cycle    ${hp}
@@ -123,7 +123,7 @@ Test for correct Duty Cycle Timer 17
     Create Nucleo Board
     Execute Command          gpioPortA.ptA Reset
     Execute Command          pause
-    Execute Command          emulation RunFor "5"
+    Execute Command          emulation RunFor "15"
 
     ${hp}=  Execute Command  gpioPortA.ptA HighPercentage
     ${actual_percent}=    Convert Duty Cycle    ${hp}
@@ -139,6 +139,9 @@ Create Nucleo Board
     Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_EXTI.cs
     Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_UART.cs
     Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_FlashController.cs
+    Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_Timers.cs
+    Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F3_ADC_Common.cs
+    Execute Command    include @${CURDIR}/renode/renode_stm32f3/STM32F334R8_ADC.cs
 
     Execute Command    $bin = @${CURDIR}/build/stm32-pwm_rgb.elf
 
