@@ -117,7 +117,14 @@ function prepare_test {
 		# delete comments from the file to allow checks like looking for 'wait'
 		# NOTE: this is not a parse and does not cover 2008 multi line
 		# comments, but should work for most cases
-		sed -i 's:--[^"]*$::g' $userfile
+		sed -i 's://[^"]*$::g' $userfile
+
+		#check for the keywords after and wait
+		if ! egrep -oq '(LL_GPIO_InitTypeDef|LL_TIM_InitTypeDef|LL_EXTI_InitTypeDef|LL_USART_InitTypeDef|LL_ADC_InitTypeDef|LL_ADC_REG_InitTypeDef)' $userfile
+		then
+		echo "Hmm, your file seems a bit weird. It does not follow the typical flow that was shown in the examples. Do I smell AI?" > error_msg
+		echo >> error_msg # empty line
+		fi
 
 
 		# SECURITY filter
@@ -160,7 +167,7 @@ function prepare_test {
 function generate_cmake_bin {
 	cd $user_task_path
 	cmake -S . -B build
-	cmake --build build 2> error_msg
+	cmake --build build 2>> error_msg
 	RET_timeout=$?
 	if [ "$RET_timeout" -ne 0 ]
 	then
