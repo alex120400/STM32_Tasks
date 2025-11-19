@@ -1,0 +1,74 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{a4wide}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\usepackage[ngerman]{babel}
+\usepackage{csquotes}
+
+\usepackage{hyperref}
+\usepackage[backend=biber, style=ieee, citestyle=numeric-comp, url=false, doi=false, isbn=false]{biblatex}
+\usepackage{xurl}
+\addbibresource{bib.bib}
+\AtEveryBibitem{\clearfield{month}}
+\AtEveryBibitem{\clearfield{day}}
+
+\begin{document}
+\pagestyle{empty}
+\setlength{\parindent}{0em}
+\section*{Task {{TASKNR}}: Automatisierte Spannungsmessung und Übertragung mittels Analog-Digital-Konverter (ADC) und UART}
+
+Ihre Aufgabe ist es, das Potentiometer auf dem Adapter Board für das Nucleo Board über den ADC zu lesen und den Messwert in einem festgelegten Format über den UART zu versenden. Konkret soll der Update-Interrupt eines Timers verwendet werden um in regelmäßigen Abständen eine einzelne ADC-Konversion zu starten und den Messwert dann mittels UART zu versenden. Nutzen Sie hierzu die Informationen im Datenblatt \cite{data_sheet} und Reference Manual \cite{ref_manual} des STM32F334 sowie das User Manual für das Nucleo-64 Board \cite{nucleo_manual} und die Beschreibung der LL Driver \cite{driver_manual}. Verwenden Sie außerdem die bereits vorbereitete Datei \enquote{adc\_poti.c} und beachten sie die folgenden Vorgaben für Ihre Lösung:
+
+\begin{itemize}
+\item Zu nutzender Timer: {{TIM}}
+\item Timer-Frequenz: 2\,Hz
+\item Potentiometer ist an PA0 angeschlossen
+\item ADC Einstellungen:
+\begin{itemize}
+    \item Single-Conversion Modus
+    \item 12 bit resolution
+    \item Daten sollen rechts beginned sein
+    \item Daten sollen laufend überschrieben werden
+    \item Synchronous Clock Modus mit 1 als Prescaler
+    \item 1.5 ADC Conversion-cycles pro Konversion
+    \item Single-Ended
+    \item Sequencer Länge von 1, da nur ein Channel gemessen wird
+\end{itemize}
+\item UART2 Konfiguration:
+\begin{itemize}
+    \item 1 Start-bit, 1 Stop-bit, 8 Data-bits, kein Paritäts-bit
+    \item Frequenz: 38400\,Hz
+    \item Nachrichtenformat: \enquote{Poti is x.yV\textbackslash n}
+    \begin{itemize}
+        \item Bytes 0-3: Poti
+        \item Bytes 5-6: is
+        \item Bytes 8-11: x.yV
+        \item Byte 12: \textbackslash n
+        \item Bytes 4, 7: \textit{Leerzeichen}
+    \end{itemize}
+\end{itemize}
+\end{itemize}
+\vspace{0.3cm}
+
+Beachten Sie dass bei zu weitem Drehen des Potentiometers Spannungen über 3.3\,V bis zu 5\,V anliegen. Dies zerstört den Pin. Achten Sie daher darauf das Potentiometer nicht zu weit zu drehen. Beachten Sie hierzu die Anfangsstellung für 0\,V in Abbildung xy und implementieren Sie Ihre Firmware. Sobald diese funktioniert und Sie Messwerte über einen seriellen Terminal wie zB HTerm empfangen, können sie das Potentiometer langsam verdrehen.\\
+
+Es ist ausdrücklich die Interrupt-Steuerung mittels Timer-Update-Interrupt zu verwenden für den spezifizierten Timer um eine ADC Konversion zu starten. Lösungen über Polling werden nicht akzeptiert. Die UART Übertragung sollte dann ebenfalls in dieser Timer-Interrupt-Service-routine gestartet werden. Das weitere versenden der Nachricht soll mittels Busy-Waiting erfolgen noch innerhalb der Timer-ISR. Bei 13 Bytes braucht das übermitteln der Nachricht bei einer Baud-Rate von 38400 ca. 3.3\,ms was sehr klein gegen das Intervall der Timer-ISR von 500\,ms ist. Sind diese Verhältnisse nicht so eindeutig bzw. gibt es noch mehr Services die zu erledigen sind sollte auf Interrupt Steuerung umgestellt werden. Aufgrund von Einschrenkungen des Firmware-Simualtors wird in dieser Übung aber explizit gewünscht es mittels Busy-waiting zu machen.  
+\\
+
+Programmieren Sie das obig definierte Verhalten in der angeh\"angten Datei \enquote{adc\_poti.c}.
+\\
+
+Um Ihre L\"osung abzugeben, senden Sie ein E-Mail mit dem Betreff \enquote{Result Task {{ TASKNR }}} und Ihrer Datei \enquote{adc\_poti.c}  an {{ SUBMISSIONEMAIL }}.
+
+\vspace{0.7cm}
+
+Viel Erfolg und m\"oge die Macht mit Ihnen sein.
+\\
+
+\fbox{\parbox{\linewidth}{KI Anmerkung: Diese Programmieraufgaben stellen keine komplexen Aufgabenstellungen dar und sind daher relativ leicht von gängigen KI-Tools l\"osenbar. Diese Aufgaben haben nicht das Ziel komplexe, \textit{real-world} Problemstellungen wiederzuspiegeln, sondern sollen ein generelles Grundverständnis darüber schaffen, wie Embedded Systems zu programmieren sind und welche Grundkonzepte hier zu beachten sind. Werden moderne KI-Tools ohne jegliche Reflexion zur L\"osungsfindung herangezogen, wird dieses Ziel verfehlt. Desweiteren sind bei den Abschlussprüfungen keine KI-Tools erlaubt, sondern vielmehr ihre Lernerkenntnisse gefragt um zu \"uberprüfen ob Sie sich das erwartete Grundverständnis erarbeitet haben.}}
+\\
+
+\printbibliography[heading=bibintoc]
+
+\end{document}

@@ -1,9 +1,5 @@
 using "./stm32f334.repl"
 
-UserButton: Miscellaneous.Button @ gpioPortC
-    -> gpioPortC@13
-
-UserLED: Miscellaneous.LED @ gpioPortA 5
 
 SW1: Miscellaneous.Button @ gpioPortA
     invert: true 

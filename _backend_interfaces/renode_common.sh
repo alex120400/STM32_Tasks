@@ -191,7 +191,7 @@ function run_renode {
 		python3 $support_files_path/renode_result.py renode/robot_output.xml error_msg
 		exit_and_save_results $FAILURE_SIM
 	fi
-
+	
 	exit_and_save_results $SUCCESS_SIM
 }
 

@@ -1,0 +1,75 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{a4wide}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\usepackage[english]{babel}
+\usepackage{csquotes}
+
+\usepackage{hyperref}
+\usepackage[backend=biber, style=ieee, citestyle=numeric-comp, url=false, doi=false, isbn=false]{biblatex}
+\usepackage{xurl}
+\addbibresource{bib.bib}
+\AtEveryBibitem{\clearfield{month}}
+\AtEveryBibitem{\clearfield{day}}
+
+\begin{document}
+\pagestyle{empty}
+\setlength{\parindent}{0em}
+\section*{Task {{TASKNR}}: Automated Voltage Measurement and Transmission Using an Analog-to-Digital Converter (ADC) and UART}
+
+Your task is to read the potentiometer on the adapter board for the Nucleo board via the ADC and transmit the measured value over UART in a specified format. Specifically, the update interrupt of a timer shall be used to start a single ADC conversion at regular intervals and to transmit the resulting measurement via UART. Use the information from the STM32F334 \textit{Data Sheet} \cite{data_sheet}, the \textit{Reference Manual} \cite{ref_manual}, the \textit{User Manual} for the Nucleo-64 board \cite{nucleo_manual}, as well as the description of the LL drivers \cite{driver_manual}. Also use the prepared file \enquote{adc\_poti.c} and follow the instructions below for your implementation:
+
+\begin{itemize}
+\item Timer to be used: {{TIM}}
+\item Timer frequency: 2\,Hz
+\item The potentiometer is connected to PA0
+\item ADC configuration:
+\begin{itemize}
+    \item Single-conversion mode
+    \item 12-bit resolution
+    \item Data should be right-aligned
+    \item Data should be continuously overwritten
+    \item Synchronous clock mode with prescaler 1
+    \item 1.5 ADC conversion cycles per conversion
+    \item Single-ended mode
+    \item Sequencer length of 1, since only one channel is measured
+\end{itemize}
+\item UART2 configuration:
+\begin{itemize}
+    \item 1 start bit, 1 stop bit, 8 data bits, no parity bit
+    \item Baud rate: 38400\,Hz
+    \item Message format: \enquote{Poti is x.yV\textbackslash n}
+    \begin{itemize}
+        \item Bytes 0–3: \texttt{Poti}
+        \item Bytes 5–6: \texttt{is}
+        \item Bytes 8–11: \texttt{x.yV}
+        \item Byte 12: \texttt{\textbackslash n}
+        \item Bytes 4, 7: \textit{space characters}
+    \end{itemize}
+\end{itemize}
+\end{itemize}
+
+\vspace{0.3cm}
+
+Please note that if the potentiometer is turned too far, voltages above 3.3\,V and up to 5\,V may be present. This will destroy the pin. Therefore, ensure that you do not turn the potentiometer too far. Refer to the initial position for 0\,V shown in Figure~xy and implement your firmware accordingly. Once the firmware works and you begin receiving measurement values via a serial terminal such as HTerm, you may slowly adjust the potentiometer.\\
+
+It is explicitly required to use interrupt control via the timer update interrupt of the specified timer to trigger an ADC conversion. Polling-based solutions will not be accepted. The UART transmission should also be initiated within this timer interrupt service routine. The remaining bytes of the message should be transmitted using busy-waiting inside the timer ISR. With 13 bytes, the message transmission at a baud rate of 38400 takes approximately 3.3\,ms, which is very small compared to the timer ISR interval of 500\,ms. If these relationships are not as clear, or if there are additional services to be handled, interrupt-driven UART transmission should be used. However, due to limitations of the firmware simulator for this exercise, busy-waiting is explicitly required.  
+\\
+
+Implement the behavior described above in the attached file \enquote{adc\_poti.c}.
+\\
+
+To submit your solution, send an email with the subject \enquote{Result Task {{ TASKNR }}} and attach your \enquote{adc\_poti.c} file to {{ SUBMISSIONEMAIL }}.
+
+\vspace{0.7cm}
+
+Good luck, and may the Force be with you.
+\\
+
+\fbox{\parbox{\linewidth}{\textbf{AI Note:} These programming tasks do not represent complex problem statements and can therefore be solved relatively easily by common AI tools. The purpose of these tasks is not to reflect complex \textit{real-world} scenarios but rather to create a general foundational understanding of how embedded systems are programmed and which basic concepts must be considered. If modern AI tools are used for solving these tasks without any form of reflection, this objective is not achieved. Furthermore, AI tools are not permitted during final examinations — instead, your own learning progress is required in order to verify that you have developed the expected fundamental understanding.}}
+\\
+
+\printbibliography[heading=bibintoc]
+
+\end{document}

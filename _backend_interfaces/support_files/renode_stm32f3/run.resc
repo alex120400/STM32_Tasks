@@ -2,7 +2,7 @@
 :description: This script runs the example on stm32f334R8
 
 $name?="STM32F334R8"
-$bin_path?=$CWD/build/stm32-adc_ldr.elf
+$bin_path?=$CWD/build/stm32-adc_poti.elf
 
 #Include custom STM32 HW
 i $CWD/renode/renode_stm32f3/STM32F3_RCC.cs
@@ -18,25 +18,34 @@ mach create $name
 machine LoadPlatformDescription $CWD/renode/renode_stm32f3/stm32f334R8_nucleo.repl
 
 # Create a terminal window showing the output of UART2
-#showAnalyzer sysbus.usart2
+showAnalyzer sysbus.usart2
 
 # Add LED
-machine LoadPlatformDescriptionFromString "LED: Miscellaneous.LED @ gpioPortA 6"
-machine LoadPlatformDescriptionFromString "gpioPortA: { 6 -> LED@0 }"
+#machine LoadPlatformDescriptionFromString "LED: Miscellaneous.LED @ gpioPortA 6"
+#machine LoadPlatformDescriptionFromString "gpioPortA: { 6 -> LED@0 }"
 
 # python hook
-cpu AddHookAtInterruptBegin "print 'Interrupt %d has started' % exceptionIndex"
+#cpu AddHookAtInterruptBegin "print 'Interrupt %d has started' % exceptionIndex"
+cpu AddHookAtInterruptBegin "monitor.Parse(\"log 'INTERRUPT DONE' 1\")"
+#cpu AddHookAtInterruptEnd "monitor.Parse(\"adc ReadDoubleWord 64\")"
+#cpu AddHookAtInterruptEnd "monitor.Parse(\"currentTime\")"
 #sysbus.cpu LogFunctionNames true "TIM1_UP_TIM16_IRQHandler"
 
 # Add PWM tester, to see highticks, lowticks
 #machine LoadPlatformDescriptionFromString "pt: PWMTester @ gpioPortB 6"
 #machine LoadPlatformDescriptionFromString "gpioPortB: { 6 -> pt@0 }"
+# This line is needed to connect the CC channel to the correct pin.
+#machine LoadPlatformDescriptionFromString "timer2: { 0 -> gpioPortA@5 }"
+
 
 # Enable GDB
 # machine StartGdbServer 3333
 
 # Feed ADC with data, channel numbering in same as actual channel name
-adc FeedVoltageSampleToChannel 2 3000 100
+adc SetDefaultValue 800 1
+adc FeedVoltageSampleToChannel 1 99 10
+adc FeedVoltageSampleToChannel 1 3300 10
+
 
 macro reset
 """

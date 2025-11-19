@@ -1,0 +1,65 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{a4wide}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\usepackage[english]{babel}
+\usepackage{csquotes}
+
+\usepackage{hyperref}
+\usepackage[backend=biber, style=ieee, citestyle=numeric-comp, url=false, doi=false, isbn=false]{biblatex}
+\usepackage{xurl}
+\addbibresource{bib.bib}
+\AtEveryBibitem{\clearfield{month}}
+\AtEveryBibitem{\clearfield{day}}
+
+\begin{document}
+\pagestyle{empty}
+\setlength{\parindent}{0em}
+\section*{Task {{TASKNR}}: Light-control using an Analog-to-Digital Converter (ADC) and a Light-Dependent Resistor (LDR)}
+
+Your task is to read the LDR on the adapter board for the Nucleo board via the ADC and implement a light control system. The idea is to turn on an LED whenever the LDR is no longer sufficiently illuminated. When the light intensity on the LDR rises above a certain threshold, the LED should be turned off again. Specifically, the update interrupt of a timer shall be used to start a single ADC conversion at regular intervals and react accordingly to the measured value. 
+
+Use the information provided in the \textit{Data Sheet} \cite{data_sheet} and \textit{Reference Manual} \cite{ref_manual} of the STM32F334, as well as the \textit{User Manual} for the Nucleo-64 board \cite{nucleo_manual} and the description of the LL drivers \cite{driver_manual}. Furthermore, use the prepared file \enquote{adc\_ldr.c} and follow the instructions below for your implementation:
+
+\begin{itemize}
+\item Pin to be controlled (and thus the LED to be used): {{PIN}}
+\item Timer to be used: {{TIM}}
+\item Timer frequency: 2\,Hz
+\item ADC configuration:
+\begin{itemize}
+    \item Single-conversion mode
+    \item 12-bit resolution
+    \item Data should be right-aligned
+    \item Data is overwritten
+    \item Synchronous clock mode with prescaler 1
+    \item 1.5 ADC conversion cycles per conversion
+    \item Single-ended mode
+    \item Sequencer length of 1, as only one channel is measured
+\end{itemize}
+\item The LDR is connected to PA1
+\item If the measured voltage is below 0.5\,V, the LED should be turned on; above that, it should be turned off.
+\end{itemize}
+
+\vspace{0.3cm}
+Please note that at high light intensity, up to 5\,V may be measured at the analog input PA1. This will destroy the pin. Therefore, ensure that the LDR, if powered, is not exposed to excessively bright light. \\
+
+It is explicitly required to use interrupt control via the timer update interrupt of the specified timer to trigger an ADC conversion and subsequently control the LED. Solutions using polling will not be accepted.
+\\
+
+Program the above-defined behavior in the attached file \enquote{adc\_ldr.c}.
+\\
+
+To submit your solution, send an email with the subject line \enquote{Result Task {{ TASKNR }}} and attach your \enquote{adc\_ldr.c} file to {{ SUBMISSIONEMAIL }}.
+
+\vspace{0.7cm}
+
+Good luck, and may the Force be with you.
+\\
+
+\fbox{\parbox{\linewidth}{\textbf{AI Note:} These programming tasks do not represent complex problem statements and can therefore be solved relatively easily by common AI tools. The purpose of these tasks is not to reflect complex \textit{real-world} scenarios but rather to create a general foundational understanding of how embedded systems are programmed and which basic concepts must be considered. If modern AI tools are used for solving these tasks without any form of reflection, this objective is not achieved. Furthermore, AI tools are not permitted during final examinations — instead, your own learning progress is required in order to verify that you have developed the expected fundamental understanding.}}
+\\
+
+\printbibliography[heading=bibintoc]
+
+\end{document}
