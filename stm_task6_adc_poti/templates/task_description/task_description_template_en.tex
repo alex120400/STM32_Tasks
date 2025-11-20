@@ -52,7 +52,14 @@ Your task is to read the potentiometer on the adapter board for the Nucleo board
 
 \vspace{0.3cm}
 
-Please note that if the potentiometer is turned too far, voltages above 3.3\,V and up to 5\,V may be present. This will destroy the pin. Therefore, ensure that you do not turn the potentiometer too far. Refer to the initial position for 0\,V shown in Figure~xy and implement your firmware accordingly. Once the firmware works and you begin receiving measurement values via a serial terminal such as HTerm, you may slowly adjust the potentiometer.\\
+Please note that if the potentiometer is turned too far, voltages above 3.3\,V and up to 5\,V may be present. This will destroy the pin. Therefore, ensure that you do not turn the potentiometer too far. Refer to the initial position for 0\,V shown in Figure \ref{fig:poti_0V} and implement your firmware accordingly. Once the firmware works and you begin receiving measurement values via a serial terminal such as HTerm, you may slowly adjust the potentiometer.\\
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{poti_0V.jpg}
+    \caption{Potentiometer in the 0\,V position. Note that the potentiometer should not be rotatable any further in the counter clockwise direction in this position. Rotating it clockwise increases the measured voltage.}
+    \label{fig:poti_0V}
+\end{figure}
 
 It is explicitly required to use interrupt control via the timer update interrupt of the specified timer to trigger an ADC conversion. Polling-based solutions will not be accepted. The UART transmission should also be initiated within this timer interrupt service routine. The remaining bytes of the message should be transmitted using busy-waiting inside the timer ISR. With 13 bytes, the message transmission at a baud rate of 38400 takes approximately 3.3\,ms, which is very small compared to the timer ISR interval of 500\,ms. If these relationships are not as clear, or if there are additional services to be handled, interrupt-driven UART transmission should be used. However, due to limitations of the firmware simulator for this exercise, busy-waiting is explicitly required.  
 \\

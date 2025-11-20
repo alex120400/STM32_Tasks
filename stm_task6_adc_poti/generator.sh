@@ -90,6 +90,7 @@ fi
 cd ${task_path}/tmp
 
 cp ${task_path}/templates/task_description/bib.bib .
+cp ${task_path}/templates/task_description/poti_0V.jpg .
 
 pdflatex desc_${user_id}_Task${task_nr}.tex >/dev/null
 biber desc_${user_id}_Task${task_nr}

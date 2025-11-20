@@ -51,7 +51,14 @@ Ihre Aufgabe ist es, das Potentiometer auf dem Adapter Board für das Nucleo Boa
 \end{itemize}
 \vspace{0.3cm}
 
-Beachten Sie dass bei zu weitem Drehen des Potentiometers Spannungen über 3.3\,V bis zu 5\,V anliegen. Dies zerstört den Pin. Achten Sie daher darauf das Potentiometer nicht zu weit zu drehen. Beachten Sie hierzu die Anfangsstellung für 0\,V in Abbildung xy und implementieren Sie Ihre Firmware. Sobald diese funktioniert und Sie Messwerte über einen seriellen Terminal wie zB HTerm empfangen, können sie das Potentiometer langsam verdrehen.\\
+Beachten Sie, dass bei zu weitem Drehen des Potentiometers Spannungen über 3.3\,V bis zu 5\,V anliegen. Dies zerstört den Pin. Achten Sie daher darauf das Potentiometer nicht zu weit zu drehen. Beachten Sie hierzu die Anfangsstellung für 0\,V in Abbildung \ref{fig:poti_0V} und implementieren Sie Ihre Firmware. Sobald diese funktioniert und Sie Messwerte über einen seriellen Terminal wie zB HTerm empfangen, können sie das Potentiometer langsam verdrehen.\\
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{poti_0V.jpg}
+    \caption{Potentiometer in der 0\,V Position. Beachten Sie, dass das Potentiometer sich in dieser Position nicht weiter gegen den Uhrzeigersinn drehen lassen sollte. Drehen im Uhrzeigersinn erhöht die gemessene Spannung.}
+    \label{fig:poti_0V}
+\end{figure}
 
 Es ist ausdrücklich die Interrupt-Steuerung mittels Timer-Update-Interrupt zu verwenden für den spezifizierten Timer um eine ADC Konversion zu starten. Lösungen über Polling werden nicht akzeptiert. Die UART Übertragung sollte dann ebenfalls in dieser Timer-Interrupt-Service-routine gestartet werden. Das weitere versenden der Nachricht soll mittels Busy-Waiting erfolgen noch innerhalb der Timer-ISR. Bei 13 Bytes braucht das übermitteln der Nachricht bei einer Baud-Rate von 38400 ca. 3.3\,ms was sehr klein gegen das Intervall der Timer-ISR von 500\,ms ist. Sind diese Verhältnisse nicht so eindeutig bzw. gibt es noch mehr Services die zu erledigen sind sollte auf Interrupt Steuerung umgestellt werden. Aufgrund von Einschrenkungen des Firmware-Simualtors wird in dieser Übung aber explizit gewünscht es mittels Busy-waiting zu machen.  
 \\
